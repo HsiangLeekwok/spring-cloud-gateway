@@ -1,0 +1,44 @@
+server:
+  port: 8040
+
+spring:
+  application:
+    name: ms-gateway
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}-${server.port}-${spring.cloud.client.hostname}
+        tags: JIFANG=NJ
+    gateway:
+      discovery:
+        locator:
+          # 让 gateway 从服务发现组件找到微服务并反向代理
+          enabled: true
+          # locator 方式比指定微服务方式多了一个微服务名称的前缀
+          # gateway_url/{服务名称}/** --> 服务名称的/**
+          # gateway_url/** --> 指定微服务或指定 url 的/**
+      routes:
+        - id: after_route
+          # lb:// 表示从服务发现组件上找到指定的微服务
+          uri: lb://ms-user
+          predicates:
+            # 当且仅当请求的时间 after 配置的时间时，才会转发到用户微服务
+            # 目前配置不会进该路由配置，所以会返回 404
+            # 将时间改为 < now 的时间，则访问 localhost:8040/** -> ms-user/**
+            # eg. 访问 http://localhost:8040/users/1 -> ms-user/users/1
+            # 时间可使用 System.out.println(ZonedDateTime.now()); 打印，然后即可看到时区。例如：2019-08-10T16:50:42.579+08:00[Asia/Shanghai]
+            - After=2010-01-20T17:42:47.789-07:00[America/Denver]
+            # 自定义时间
+            - TimeBetween=上午09:00,下午05:00
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
