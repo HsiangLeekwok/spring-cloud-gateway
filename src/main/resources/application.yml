@@ -32,7 +32,12 @@ spring:
             # 时间可使用 System.out.println(ZonedDateTime.now()); 打印，然后即可看到时区。例如：2019-08-10T16:50:42.579+08:00[Asia/Shanghai]
             - After=2010-01-20T17:42:47.789-07:00[America/Denver]
             # 自定义时间
-            - TimeBetween=上午09:00,下午05:00
+            - TimeBetween=上午00:00,下午11:59
+          filters:
+            # 转发路由的时候添加一个名为 X-Request-Foo 的 header，值为 Bar
+            - AddRequestHeader=X-Request-Foo, Bar
+            # 自定义过滤器
+            - MyLog=aaa, bbb
 
 management:
   endpoints:
