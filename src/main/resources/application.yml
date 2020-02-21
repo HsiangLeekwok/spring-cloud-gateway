@@ -21,6 +21,11 @@ spring:
           # gateway_url/{服务名称}/** --> 服务名称的/**
           # gateway_url/** --> 指定微服务或指定 url 的/**
       routes:
+        # 过滤器执行顺序：
+        # 1、Order 越小越优先执行
+        # 2、局部过滤器，按照配置顺序执行
+        # 3、优先执行相同 order 的默认过滤器
+        # 4、自行控制 Order
         - id: after_route
           # lb:// 表示从服务发现组件上找到指定的微服务
           uri: lb://ms-user
@@ -43,7 +48,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: gateway
   endpoint:
     health:
       show-details: always
